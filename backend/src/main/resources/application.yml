@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: BrahminMilan
+  datasource:
+    url: jdbc:mysql://localhost:3306/brahmin_milan?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: password # User needs to change this
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970 # Use a secure 256-bit key in production
+  expiration: 86400000 # 1 day in milliseconds
+  refresh-expiration: 604800000 # 7 days
+
+razorpay:
+  key_id: test_key_id # Replace with actual Razorpay Key ID
+  key_secret: test_key_secret # Replace with actual Razorpay Key Secret
+
+server:
+  port: 8080
