@@ -11,6 +11,7 @@ import ProfileForm from './pages/ProfileForm';
 import SearchProfiles from './pages/SearchProfiles';
 import ChatWindow from './pages/ChatWindow';
 import SubscriptionPlans from './pages/SubscriptionPlans';
+import AdminDashboard from './pages/AdminDashboard';
 
 const PrivateRoute = ({ children }) => {
     const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
@@ -46,6 +47,7 @@ const AppRouter = () => {
                                   <a href="/search" className="text-sm font-medium text-gray-600 hover:text-matrimony-600 transition">Matches</a>
                                   <a href="/chat" className="text-sm font-medium text-gray-600 hover:text-matrimony-600 transition">Chat</a>
                                   <a href="/upgrade" className="text-sm font-medium text-yellow-600 hover:text-yellow-700 transition">Upgrade</a>
+                                  <a href="/admin" className="text-sm font-bold text-gray-900 bg-gray-100 px-3 py-1 rounded-full hover:bg-gray-200 transition">Admin</a>
                                   <button onClick={handleLogout} className="flex items-center text-sm font-medium text-gray-600 hover:text-matrimony-600 transition">
                                     <LogOut className="w-4 h-4 mr-1" /> Logout
                                   </button>
@@ -64,6 +66,7 @@ const AppRouter = () => {
                         <Route path="/search" element={<PrivateRoute><SearchProfiles /></PrivateRoute>} />
                         <Route path="/chat" element={<PrivateRoute><ChatWindow /></PrivateRoute>} />
                         <Route path="/upgrade" element={<PrivateRoute><SubscriptionPlans /></PrivateRoute>} />
+                        <Route path="/admin" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
                     </Routes>
                 </main>
                 <footer className="bg-gray-900 text-gray-400 py-12">
