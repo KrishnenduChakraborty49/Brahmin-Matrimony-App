@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Filter, Search, Heart, MapPin, Briefcase, Star } from 'lucide-react';
 
 const mockProfiles = [
-  { id: 1, name: 'Priya Sharma', age: 26, height: '5\'4"', profession: 'Software Engineer', location: 'Bangalore', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80' },
-  { id: 2, name: 'Anjali Desai', age: 24, height: '5\'2"', profession: 'Doctor', location: 'Mumbai', img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80' },
-  { id: 3, name: 'Kavita Iyer', age: 28, height: '5\'6"', profession: 'Architect', location: 'Chennai', img: 'https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?w=400&q=80' },
-  { id: 4, name: 'Neha Mishra', age: 27, height: '5\'3"', profession: 'CA', location: 'Delhi', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=80' }
+  { id: 1, name: 'Priya Sharma', age: 26, height: '5\'4"', profession: 'Software Engineer', location: 'Bangalore', matchScore: 92, img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80' },
+  { id: 2, name: 'Anjali Desai', age: 24, height: '5\'2"', profession: 'Doctor', location: 'Mumbai', matchScore: 85, img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80' },
+  { id: 3, name: 'Kavita Iyer', age: 28, height: '5\'6"', profession: 'Architect', location: 'Chennai', matchScore: 78, img: 'https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?w=400&q=80' },
+  { id: 4, name: 'Neha Mishra', age: 27, height: '5\'3"', profession: 'CA', location: 'Delhi', matchScore: 65, img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=80' }
 ];
 
 const SearchProfiles = () => {
@@ -43,6 +43,9 @@ const SearchProfiles = () => {
           <div key={profile.id} className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
             <div className="relative h-64 overflow-hidden bg-gray-200">
               <img src={profile.img} alt={profile.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-matrimony-600 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-white/50">
+                {profile.matchScore}% Match
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
               <div className="absolute bottom-4 left-4 right-4 text-white">
                 <h3 className="text-xl font-bold">{profile.name}, {profile.age}</h3>

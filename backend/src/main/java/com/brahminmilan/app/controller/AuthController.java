@@ -11,6 +11,7 @@ import com.brahminmilan.app.repository.RoleRepository;
 import com.brahminmilan.app.repository.UserRepository;
 import com.brahminmilan.app.security.JwtUtils;
 import com.brahminmilan.app.security.UserDetailsImpl;
+import com.brahminmilan.app.service.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,10 +41,13 @@ public class AuthController {
     RoleRepository roleRepository;
 
     @Autowired
-    PasswordEncoder encoder;
+    private PasswordEncoder encoder;
 
     @Autowired
-    JwtUtils jwtUtils;
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -86,6 +90,9 @@ public class AuthController {
 
         user.setRoles(roles);
         userRepository.save(user);
+
+        // Send Welcome Email asynchronously
+        emailService.sendWelcomeEmail(user.getEmail(), user.getFullName());
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }

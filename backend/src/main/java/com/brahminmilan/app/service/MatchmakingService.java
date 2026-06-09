@@ -99,4 +99,49 @@ public class MatchmakingService {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return interestRepository.findByReceiver(user);
     }
+
+    /**
+     * Advanced AI Match Scoring Algorithm (Heuristic based)
+     * Calculates compatibility score between 0 to 100
+     */
+    public int calculateMatchScore(Profile userProfile, Profile targetProfile) {
+        int score = 0;
+        
+        // 1. Marital Status compatibility (30 points)
+        if (userProfile.getMaritalStatus() == targetProfile.getMaritalStatus()) {
+            score += 30;
+        }
+
+        // 2. Education compatibility (20 points)
+        if (userProfile.getHighestEducation() != null && targetProfile.getHighestEducation() != null) {
+            if (userProfile.getHighestEducation().equalsIgnoreCase(targetProfile.getHighestEducation())) {
+                score += 20;
+            } else {
+                score += 10; // Partial match for having education info
+            }
+        }
+
+        // 3. Location / State compatibility (20 points)
+        if (userProfile.getState() != null && targetProfile.getState() != null) {
+            if (userProfile.getState().equalsIgnoreCase(targetProfile.getState())) {
+                score += 20;
+                // Extra points for same city
+                if (userProfile.getCity() != null && userProfile.getCity().equalsIgnoreCase(targetProfile.getCity())) {
+                    score += 10; 
+                }
+            }
+        }
+
+        // 4. Gotra Check (Brahmin strict rule: Should NOT be same gotra)
+        if (userProfile.getGotra() != null && targetProfile.getGotra() != null) {
+            if (userProfile.getGotra().equalsIgnoreCase(targetProfile.getGotra())) {
+                score -= 50; // Huge penalty for same gotra
+            } else {
+                score += 20; // Bonus for different gotra
+            }
+        }
+
+        // Bound the score between 0 and 100
+        return Math.max(0, Math.min(100, score));
+    }
 }
