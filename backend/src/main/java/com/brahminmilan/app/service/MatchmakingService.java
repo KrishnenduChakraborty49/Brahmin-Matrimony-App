@@ -113,31 +113,29 @@ public class MatchmakingService {
         }
 
         // 2. Education compatibility (20 points)
-        if (userProfile.getHighestEducation() != null && targetProfile.getHighestEducation() != null) {
-            if (userProfile.getHighestEducation().equalsIgnoreCase(targetProfile.getHighestEducation())) {
+        if (userProfile.getEducation() != null && targetProfile.getEducation() != null) {
+            if (userProfile.getEducation().equalsIgnoreCase(targetProfile.getEducation())) {
                 score += 20;
             } else {
                 score += 10; // Partial match for having education info
             }
         }
 
-        // 3. Location / State compatibility (20 points)
-        if (userProfile.getState() != null && targetProfile.getState() != null) {
-            if (userProfile.getState().equalsIgnoreCase(targetProfile.getState())) {
+        // 3. Location compatibility (20 points)
+        if (userProfile.getLocation() != null && targetProfile.getLocation() != null) {
+            if (userProfile.getLocation().equalsIgnoreCase(targetProfile.getLocation())) {
                 score += 20;
-                // Extra points for same city
-                if (userProfile.getCity() != null && userProfile.getCity().equalsIgnoreCase(targetProfile.getCity())) {
-                    score += 10; 
-                }
+            } else {
+                score += 5; // Both have location specified
             }
         }
 
-        // 4. Gotra Check (Brahmin strict rule: Should NOT be same gotra)
-        if (userProfile.getGotra() != null && targetProfile.getGotra() != null) {
-            if (userProfile.getGotra().equalsIgnoreCase(targetProfile.getGotra())) {
-                score -= 50; // Huge penalty for same gotra
+        // 4. Sub-caste / Gotra Check (Brahmin strict rule: Should NOT be same sub-caste for some traditions)
+        if (userProfile.getSubCaste() != null && targetProfile.getSubCaste() != null) {
+            if (userProfile.getSubCaste().equalsIgnoreCase(targetProfile.getSubCaste())) {
+                score -= 50; // Huge penalty for same sub-caste (gotra equivalent)
             } else {
-                score += 20; // Bonus for different gotra
+                score += 20; // Bonus for different sub-caste
             }
         }
 
