@@ -26,8 +26,12 @@ public class FileStorageService {
     }
 
     public String storeFile(MultipartFile file) {
+        return storeFile(file, "general");
+    }
+
+    public String storeFile(MultipartFile file, String folder) {
         try {
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", folder));
             return uploadResult.get("url").toString();
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload file to Cloudinary", e);

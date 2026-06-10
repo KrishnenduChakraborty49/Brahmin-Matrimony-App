@@ -92,7 +92,7 @@ public class AuthController {
         userRepository.save(user);
 
         // Send Welcome Email asynchronously
-        emailService.sendWelcomeEmail(user.getEmail(), user.getFullName());
+        emailService.sendWelcomeEmail(user.getEmail(), "Valued Member");
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
