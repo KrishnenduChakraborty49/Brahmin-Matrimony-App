@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { User, Heart, Star, Settings, MessageCircle, Bell } from 'lucide-react';
+import { User, Users, Heart, Star, Settings, MessageCircle, Bell, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
