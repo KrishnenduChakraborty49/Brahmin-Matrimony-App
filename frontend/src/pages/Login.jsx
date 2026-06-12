@@ -2,18 +2,36 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
+import api from '../api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Simulate login for now
-    dispatch({ type: 'LOGIN_SUCCESS', payload: { email, name: 'User' } });
-    navigate('/dashboard');
+    setError('');
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/signin', { email, password });
+      const { token, id, email: userEmail, roles } = response.data;
+      dispatch({
+        type: 'LOGIN_SUCCESS',
+        payload: {
+          token,
+          user: { id, email: userEmail, roles }
+        }
+      });
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Invalid email or password.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,6 +43,11 @@ const Login = () => {
         </div>
         
         <div className="p-8">
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-xl text-sm font-medium">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
@@ -65,9 +88,10 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-md text-lg font-bold text-white bg-matrimony-600 hover:bg-matrimony-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-matrimony-500 transition-all hover:shadow-lg"
+              disabled={loading}
+              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-md text-lg font-bold text-white bg-matrimony-600 hover:bg-matrimony-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-matrimony-500 transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign In <ArrowRight className="ml-2 w-5 h-5" />
+              {loading ? 'Signing In...' : <>Sign In <ArrowRight className="ml-2 w-5 h-5" /></>}
             </button>
           </form>
 

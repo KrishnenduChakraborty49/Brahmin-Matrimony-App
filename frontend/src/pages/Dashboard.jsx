@@ -1,10 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { User, Users, Heart, Star, Settings, MessageCircle, Bell, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../api';
 
 const Dashboard = () => {
   const user = useSelector(state => state.auth.user);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/profiles/me');
+        if (response.data) {
+          setProfile(response.data);
+        }
+      } catch (err) {
+        console.log('No profile found yet or error loading:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const getCompletionPercentage = () => {
+    if (!profile) return 10;
+    const fields = ['fullName', 'gender', 'dob', 'maritalStatus', 'subCaste', 'motherTongue', 'location', 'education', 'occupation', 'aboutMe'];
+    const filled = fields.filter(field => !!profile[field]);
+    return Math.round((filled.length / fields.length) * 100);
+  };
+
+  const completion = getCompletionPercentage();
 
   return (
     <div className="min-h-screen bg-gray-50 pb-12">
@@ -34,11 +62,13 @@ const Dashboard = () => {
                  {/* Placeholder for Profile Picture */}
                  <User className="w-16 h-16 text-gray-400" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">{user?.name || 'New Member'}</h2>
-              <p className="text-sm text-gray-500 mb-4">Profile ID: #BM100452</p>
+              <h2 className="text-xl font-bold text-gray-900 text-center">
+                {profile?.fullName || user?.email || 'New Member'}
+              </h2>
+              <p className="text-sm text-gray-500 mb-4">Profile ID: #BM100{profile?.id || '---'}</p>
               
               <Link to="/profile/edit" className="w-full text-center py-2 px-4 border border-matrimony-600 text-matrimony-600 rounded-lg hover:bg-matrimony-50 font-medium transition">
-                Complete Profile
+                {profile ? 'Edit Profile' : 'Complete Profile'}
               </Link>
             </div>
             
@@ -46,10 +76,10 @@ const Dashboard = () => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-600">Profile Completion</span>
-                  <span className="font-bold text-matrimony-600">30%</span>
+                  <span className="font-bold text-matrimony-600">{completion}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div className="bg-matrimony-500 h-2.5 rounded-full" style={{ width: '30%' }}></div>
+                  <div className="bg-matrimony-500 h-2.5 rounded-full" style={{ width: `${completion}%` }}></div>
                 </div>
               </div>
             </div>
@@ -102,11 +132,23 @@ const Dashboard = () => {
               
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Sparkles className="w-12 h-12 text-gray-300 mb-4" />
-                <h4 className="text-lg font-medium text-gray-900">Complete your profile to see matches</h4>
-                <p className="text-gray-500 mt-2 max-w-sm">We need more information about you to find the most compatible matches in the community.</p>
-                <Link to="/profile/edit" className="mt-6 px-6 py-2 bg-matrimony-600 text-white rounded-full font-medium hover:bg-matrimony-700 transition shadow-sm">
-                  Update Profile Now
-                </Link>
+                {completion < 50 ? (
+                  <>
+                    <h4 className="text-lg font-medium text-gray-900">Complete your profile to see matches</h4>
+                    <p className="text-gray-500 mt-2 max-w-sm">We need more information about you to find the most compatible matches in the community.</p>
+                    <Link to="/profile/edit" className="mt-6 px-6 py-2 bg-matrimony-600 text-white rounded-full font-medium hover:bg-matrimony-700 transition shadow-sm">
+                      Update Profile Now
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <h4 className="text-lg font-medium text-gray-900">No matches found matching your criteria</h4>
+                    <p className="text-gray-500 mt-2 max-w-sm">Try broadening your partner preferences or explore matches in other areas.</p>
+                    <Link to="/search" className="mt-6 px-6 py-2 bg-matrimony-600 text-white rounded-full font-medium hover:bg-matrimony-700 transition shadow-sm">
+                      Explore Members
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
 

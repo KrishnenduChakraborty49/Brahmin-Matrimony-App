@@ -1,17 +1,28 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, UserPlus, ArrowRight } from 'lucide-react';
+import api from '../api';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    // Simulate register
-    alert("Registration successful! Please login.");
-    navigate('/login');
+    setError('');
+    setLoading(true);
+    try {
+      await api.post('/auth/signup', { email, password });
+      alert("Registration successful! Please login.");
+      navigate('/login');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to register. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,6 +35,11 @@ const Register = () => {
         </div>
         
         <div className="p-8">
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-xl text-sm font-medium">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleRegister} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
@@ -61,9 +77,16 @@ const Register = () => {
 
             <button
               type="submit"
-              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-md text-lg font-bold text-white bg-matrimony-600 hover:bg-matrimony-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-matrimony-500 transition-all hover:shadow-lg"
+              disabled={loading}
+              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-md text-lg font-bold text-white bg-matrimony-600 hover:bg-matrimony-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-matrimony-500 transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <UserPlus className="mr-2 w-5 h-5" /> Register Now
+              {loading ? (
+                'Registering...'
+              ) : (
+                <>
+                  <UserPlus className="mr-2 w-5 h-5" /> Register Now
+                </>
+              )}
             </button>
             <p className="text-xs text-center text-gray-500 mt-4">
               By registering, you agree to our Terms of Service and Privacy Policy.
