@@ -1,6 +1,100 @@
 import React, { useState, useEffect } from 'react';
-import { Filter, Search, Heart, MapPin, Briefcase, Star, Loader } from 'lucide-react';
+import { Filter, Search, Heart, MapPin, Briefcase, Star, Loader, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../api';
+
+const ProfileCard = ({ profile }) => {
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+
+  const photoUrls = profile.photoUrls && profile.photoUrls.length > 0
+    ? profile.photoUrls
+    : [
+        profile.photoUrl ||
+        (profile.gender === 'FEMALE'
+          ? 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80'
+          : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80')
+      ];
+
+  const handleNextPhoto = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setActivePhotoIndex((prev) => (prev + 1) % photoUrls.length);
+  };
+
+  const handlePrevPhoto = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setActivePhotoIndex((prev) => (prev - 1 + photoUrls.length) % photoUrls.length);
+  };
+
+  return (
+    <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+      {/* Image Container with Hover Scaling */}
+      <div className="relative h-64 overflow-hidden bg-gray-200">
+        <img 
+          src={photoUrls[activePhotoIndex]} 
+          alt={profile.fullName} 
+          className="w-full h-full object-cover transition-transform duration-500" 
+        />
+
+        {/* Carousel controls if more than 1 photo */}
+        {photoUrls.length > 1 && (
+          <>
+            <button 
+              onClick={handlePrevPhoto}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm z-20 transition"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={handleNextPhoto}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm z-20 transition"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+            
+            {/* 1/2, 2/2 Indicator */}
+            <div className="absolute bottom-14 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-2.5 py-0.5 rounded-full z-20 font-bold backdrop-blur-sm tracking-wide">
+              {activePhotoIndex + 1}/{photoUrls.length}
+            </div>
+          </>
+        )}
+
+        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-matrimony-600 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-white/50 z-10">
+          {profile.matchScore}% Match
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent"></div>
+        <div className="absolute bottom-4 left-4 right-4 text-white z-10">
+          <h3 className="text-xl font-bold">{profile.fullName || 'Member'}</h3>
+          <p className="text-sm opacity-90">{profile.gender} • {profile.height ? `${profile.height} ft` : ''}</p>
+        </div>
+      </div>
+      
+      {/* Content Area */}
+      <div className="p-5">
+        <div className="space-y-3 mb-6">
+          <div className="flex items-center text-sm text-gray-600">
+            <Briefcase className="w-4 h-4 mr-2 text-matrimony-500" /> {profile.occupation || 'Not specified'}
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <MapPin className="w-4 h-4 mr-2 text-matrimony-500" /> {profile.location || 'Not specified'}
+          </div>
+          <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider bg-gray-100 px-2.5 py-1 rounded-full inline-block">
+            {profile.subCaste || 'Brahmin'}
+          </div>
+        </div>
+        
+        <div className="flex gap-2">
+          <button className="flex-1 py-2.5 bg-matrimony-50 text-matrimony-600 font-semibold rounded-xl hover:bg-matrimony-100 transition flex items-center justify-center">
+            <Heart className="w-4 h-4 mr-2" /> Connect
+          </button>
+          <button className="p-2.5 border border-gray-200 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-xl transition flex items-center justify-center">
+            <Star className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const SearchProfiles = () => {
   const [profiles, setProfiles] = useState([]);
@@ -21,14 +115,6 @@ const SearchProfiles = () => {
     };
     fetchMatches();
   }, []);
-
-  const getProfileImage = (profile) => {
-    if (profile.photoUrl) return profile.photoUrl;
-    if (profile.gender === 'FEMALE') {
-      return 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80';
-    }
-    return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80';
-  };
 
   const filteredProfiles = profiles.filter(profile => {
     const term = searchTerm.toLowerCase();
@@ -85,46 +171,7 @@ const SearchProfiles = () => {
         /* Grid of Profiles */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredProfiles.map(profile => (
-            <div key={profile.id} className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
-              <div className="relative h-64 overflow-hidden bg-gray-200">
-                <img 
-                  src={getProfileImage(profile)} 
-                  alt={profile.fullName} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
-                />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-matrimony-600 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-white/50">
-                  {profile.matchScore}% Match
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <h3 className="text-xl font-bold">{profile.fullName || 'Member'}</h3>
-                  <p className="text-sm opacity-90">{profile.gender} • {profile.height ? `${profile.height} ft` : ''}</p>
-                </div>
-              </div>
-              
-              <div className="p-5">
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Briefcase className="w-4 h-4 mr-2 text-matrimony-500" /> {profile.occupation || 'Not specified'}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="w-4 h-4 mr-2 text-matrimony-500" /> {profile.location || 'Not specified'}
-                  </div>
-                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider bg-gray-100 px-2.5 py-1 rounded-full inline-block">
-                    {profile.subCaste || 'Brahmin'}
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  <button className="flex-1 py-2.5 bg-matrimony-50 text-matrimony-600 font-semibold rounded-xl hover:bg-matrimony-100 transition flex items-center justify-center">
-                    <Heart className="w-4 h-4 mr-2" /> Connect
-                  </button>
-                  <button className="p-2.5 border border-gray-200 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-xl transition flex items-center justify-center">
-                    <Star className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ProfileCard key={profile.id} profile={profile} />
           ))}
         </div>
       )}

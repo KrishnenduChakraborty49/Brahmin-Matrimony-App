@@ -66,17 +66,28 @@ public class ProfileService {
             dto.setFoodPreference(p.getFoodPreference());
             dto.setAboutMe(p.getAboutMe());
 
-            // Fetch profile picture if approved, else use first one or none
+            // Fetch profile pictures if approved, else fallback to first or empty
             List<Photo> photos = photoRepository.findByUserIdAndType(p.getUser().getId(), PhotoType.PROFILE);
-            String photoUrl = null;
-            if (!photos.isEmpty()) {
-                photoUrl = photos.stream()
-                        .filter(Photo::isApproved)
-                        .map(Photo::getUrl)
-                        .findFirst()
-                        .orElse(photos.get(0).getUrl()); // Fallback to unapproved if none approved
+            List<String> photoUrlsList = new ArrayList<>();
+            String primaryPhoto = null;
+            
+            for (Photo photo : photos) {
+                if (photo.isApproved()) {
+                    photoUrlsList.add(photo.getUrl());
+                }
             }
-            dto.setPhotoUrl(photoUrl);
+            
+            // If no approved photos found, fallback to first unapproved photo
+            if (photoUrlsList.isEmpty() && !photos.isEmpty()) {
+                photoUrlsList.add(photos.get(0).getUrl());
+            }
+            
+            if (!photoUrlsList.isEmpty()) {
+                primaryPhoto = photoUrlsList.get(0);
+            }
+            
+            dto.setPhotoUrl(primaryPhoto);
+            dto.setPhotoUrls(photoUrlsList);
 
             // Compute compatibility score
             int score = 0;

@@ -24,5 +24,6 @@ public class MatchProfileDto {
     private String foodPreference;
     private String aboutMe;
     private String photoUrl;
+    private java.util.List<String> photoUrls;
     private int matchScore;
 }
