@@ -36,8 +36,8 @@ public class BrahminMilanApplication {
                 }
             }
 
-            // 2. Seed default girl profile (Payel Mukherjee)
-            String email = "payel.mukherjee@gmail.com";
+            // 2. Seed default girl profile (Sohini Mazumdar)
+            String email = "sohini.mazumdar@gmail.com";
             if (!userRepository.existsByEmail(email)) {
                 User user = new User();
                 user.setEmail(email);
@@ -56,7 +56,7 @@ public class BrahminMilanApplication {
                 // Create Profile
                 Profile profile = new Profile();
                 profile.setUser(user);
-                profile.setFullName("Payel Mukherjee");
+                profile.setFullName("Sohini Mazumdar");
                 profile.setGender(Gender.FEMALE);
                 profile.setDob(LocalDate.of(2003, 8, 15));
                 profile.setHeight(5.3);
