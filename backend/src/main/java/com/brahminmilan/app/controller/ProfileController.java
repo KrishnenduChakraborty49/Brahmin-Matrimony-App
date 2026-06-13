@@ -37,6 +37,15 @@ public class ProfileController {
         return ResponseEntity.ok(updatedProfile);
     }
 
+    @GetMapping
+    public ResponseEntity<?> getMatches(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            return ResponseEntity.ok(profileService.getMatchesForUser(userDetails.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
+    }
+
     @PostMapping("/me/photos")
     public ResponseEntity<?> uploadPhoto(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                          @RequestParam("file") MultipartFile file,

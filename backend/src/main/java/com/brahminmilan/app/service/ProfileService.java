@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.brahminmilan.app.dto.MatchProfileDto;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,6 +32,67 @@ public class ProfileService {
 
     @Autowired
     private FileStorageService fileStorageService;
+
+    @Autowired
+    private MatchmakingService matchmakingService;
+
+    public List<MatchProfileDto> getMatchesForUser(Long currentUserId) {
+        Profile currentProfile = profileRepository.findByUserId(currentUserId).orElse(null);
+
+        List<Profile> allProfiles = profileRepository.findAll();
+        List<MatchProfileDto> matches = new ArrayList<>();
+
+        for (Profile p : allProfiles) {
+            // Exclude current user
+            if (p.getUser().getId().equals(currentUserId)) {
+                continue;
+            }
+
+            MatchProfileDto dto = new MatchProfileDto();
+            dto.setId(p.getId());
+            dto.setUserId(p.getUser().getId());
+            dto.setFullName(p.getFullName());
+            dto.setGender(p.getGender());
+            dto.setDob(p.getDob());
+            dto.setHeight(p.getHeight());
+            dto.setSubCaste(p.getSubCaste());
+            dto.setMotherTongue(p.getMotherTongue());
+            dto.setMaritalStatus(p.getMaritalStatus());
+            dto.setLocation(p.getLocation());
+            dto.setEducation(p.getEducation());
+            dto.setOccupation(p.getOccupation());
+            dto.setCompanyName(p.getCompanyName());
+            dto.setSalary(p.getSalary());
+            dto.setFoodPreference(p.getFoodPreference());
+            dto.setAboutMe(p.getAboutMe());
+
+            // Fetch profile picture if approved, else use first one or none
+            List<Photo> photos = photoRepository.findByUserIdAndType(p.getUser().getId(), PhotoType.PROFILE);
+            String photoUrl = null;
+            if (!photos.isEmpty()) {
+                photoUrl = photos.stream()
+                        .filter(Photo::isApproved)
+                        .map(Photo::getUrl)
+                        .findFirst()
+                        .orElse(photos.get(0).getUrl()); // Fallback to unapproved if none approved
+            }
+            dto.setPhotoUrl(photoUrl);
+
+            // Compute compatibility score
+            int score = 0;
+            if (currentProfile != null) {
+                score = matchmakingService.calculateMatchScore(currentProfile, p);
+            }
+            dto.setMatchScore(score);
+
+            matches.add(dto);
+        }
+
+        // Sort by match score descending
+        matches.sort((a, b) -> Integer.compare(b.getMatchScore(), a.getMatchScore()));
+
+        return matches;
+    }
 
     @Transactional
     public Profile updateProfile(Long userId, ProfileDto profileDto) {
