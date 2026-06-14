@@ -90,6 +90,61 @@ public class BrahminMilanApplication {
                 photo2.setApproved(true);
                 photoRepository.save(photo2);
             }
+
+            // 3. Seed default girl profile (Ipsita Bhattacharya)
+            String email2 = "ipsita.bhattacharya@gmail.com";
+            if (!userRepository.existsByEmail(email2)) {
+                User user2 = new User();
+                user2.setEmail(email2);
+                user2.setPassword(passwordEncoder.encode("password123"));
+                user2.setVerified(true);
+
+                Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                        .orElseThrow(() -> new RuntimeException("Role ROLE_USER not found"));
+
+                Set<Role> roles = new HashSet<>();
+                roles.add(userRole);
+                user2.setRoles(roles);
+
+                userRepository.save(user2);
+
+                // Create Profile
+                Profile profile2 = new Profile();
+                profile2.setUser(user2);
+                profile2.setFullName("Ipsita Bhattacharya");
+                profile2.setGender(Gender.FEMALE);
+                profile2.setDob(LocalDate.of(2001, 5, 10));
+                profile2.setHeight(5.4);
+                profile2.setSubCaste("Kulin");
+                profile2.setMotherTongue("Bengali");
+                profile2.setMaritalStatus(MaritalStatus.NEVER_MARRIED);
+                profile2.setLocation("Serampore, West Bengal");
+                profile2.setEducation("M.A at Sanskrit");
+                profile2.setOccupation("Teacher");
+                profile2.setCompanyName("Serampore Girls College");
+                profile2.setSalary("0 - 5 Lakhs");
+                profile2.setFoodPreference("Vegetarian");
+                profile2.setAboutMe("I am a traditional and well-educated person who completed my M.A. in Sanskrit. I love literature, classical music, and teaching.");
+                profile2.setPartnerPreferences("Looking for an educated and cultured Brahmin groom from West Bengal.");
+
+                profileRepository.save(profile2);
+
+                // Create Photo 1 (Primary profile photo)
+                Photo photo1 = new Photo();
+                photo1.setUser(user2);
+                photo1.setType(PhotoType.PROFILE);
+                photo1.setUrl("http://localhost:5173/ipsita1.jpg");
+                photo1.setApproved(true);
+                photoRepository.save(photo1);
+
+                // Create Photo 2 (Second profile photo)
+                Photo photo2 = new Photo();
+                photo2.setUser(user2);
+                photo2.setType(PhotoType.PROFILE);
+                photo2.setUrl("http://localhost:5173/ipsita2.jpg");
+                photo2.setApproved(true);
+                photoRepository.save(photo2);
+            }
         };
     }
 }
