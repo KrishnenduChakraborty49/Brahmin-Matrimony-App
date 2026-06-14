@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @SpringBootApplication
@@ -27,6 +28,14 @@ public class BrahminMilanApplication {
             PhotoRepository photoRepository,
             PasswordEncoder passwordEncoder) {
         return args -> {
+            // Delete old "Payel Mukherjee" seed if it exists to prevent duplication
+            userRepository.findByEmail("payel.mukherjee@gmail.com").ifPresent(user -> {
+                profileRepository.findByUserId(user.getId()).ifPresent(profileRepository::delete);
+                List<Photo> photos = photoRepository.findByUserId(user.getId());
+                photoRepository.deleteAll(photos);
+                userRepository.delete(user);
+            });
+
             // 1. Seed Roles
             for (RoleName roleName : RoleName.values()) {
                 if (roleRepository.findByName(roleName).isEmpty()) {
