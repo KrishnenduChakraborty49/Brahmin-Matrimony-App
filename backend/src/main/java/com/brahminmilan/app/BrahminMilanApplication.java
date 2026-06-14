@@ -154,6 +154,61 @@ public class BrahminMilanApplication {
                 photo2.setApproved(true);
                 photoRepository.save(photo2);
             }
+
+            // 4. Seed default girl profile (Ipsita Chakraborty)
+            String email3 = "ipsita.chakraborty@gmail.com";
+            if (!userRepository.existsByEmail(email3)) {
+                User user3 = new User();
+                user3.setEmail(email3);
+                user3.setPassword(passwordEncoder.encode("password123"));
+                user3.setVerified(true);
+
+                Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                        .orElseThrow(() -> new RuntimeException("Role ROLE_USER not found"));
+
+                Set<Role> roles = new HashSet<>();
+                roles.add(userRole);
+                user3.setRoles(roles);
+
+                userRepository.save(user3);
+
+                // Create Profile
+                Profile profile3 = new Profile();
+                profile3.setUser(user3);
+                profile3.setFullName("Ipsita Chakraborty");
+                profile3.setGender(Gender.FEMALE);
+                profile3.setDob(LocalDate.of(2002, 11, 20));
+                profile3.setHeight(5.2);
+                profile3.setSubCaste("Vaidik");
+                profile3.setMotherTongue("Bengali");
+                profile3.setMaritalStatus(MaritalStatus.NEVER_MARRIED);
+                profile3.setLocation("Baharampur, Murshidabad, West Bengal");
+                profile3.setEducation("B.A in Geography");
+                profile3.setOccupation("Student");
+                profile3.setCompanyName("Krishnath College");
+                profile3.setSalary("0 - 5 Lakhs");
+                profile3.setFoodPreference("Vegetarian");
+                profile3.setAboutMe("I am a cheerful and down-to-earth person who recently graduated with a B.A. in Geography. I love exploring new places and studying nature.");
+                profile3.setPartnerPreferences("Looking for an educated, caring, and understanding Brahmin partner.");
+
+                profileRepository.save(profile3);
+
+                // Create Photo 1 (Primary profile photo)
+                Photo photo1 = new Photo();
+                photo1.setUser(user3);
+                photo1.setType(PhotoType.PROFILE);
+                photo1.setUrl("http://localhost:5173/ipsitac1.jpg");
+                photo1.setApproved(true);
+                photoRepository.save(photo1);
+
+                // Create Photo 2 (Second profile photo)
+                Photo photo2 = new Photo();
+                photo2.setUser(user3);
+                photo2.setType(PhotoType.PROFILE);
+                photo2.setUrl("http://localhost:5173/ipsitac2.jpg");
+                photo2.setApproved(true);
+                photoRepository.save(photo2);
+            }
         };
     }
 }
