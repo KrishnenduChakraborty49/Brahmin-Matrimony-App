@@ -264,6 +264,61 @@ public class BrahminMilanApplication {
                 photo2.setApproved(true);
                 photoRepository.save(photo2);
             }
+
+            // 6. Seed default girl profile (Sneha Roy Mukherjee)
+            String email5 = "sneha.mukherjee@gmail.com";
+            if (!userRepository.existsByEmail(email5)) {
+                User user5 = new User();
+                user5.setEmail(email5);
+                user5.setPassword(passwordEncoder.encode("password123"));
+                user5.setVerified(true);
+
+                Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                        .orElseThrow(() -> new RuntimeException("Role ROLE_USER not found"));
+
+                Set<Role> roles = new HashSet<>();
+                roles.add(userRole);
+                user5.setRoles(roles);
+
+                userRepository.save(user5);
+
+                // Create Profile
+                Profile profile5 = new Profile();
+                profile5.setUser(user5);
+                profile5.setFullName("Sneha Roy Mukherjee");
+                profile5.setGender(Gender.FEMALE);
+                profile5.setDob(LocalDate.of(2005, 7, 25));
+                profile5.setHeight(5.2);
+                profile5.setSubCaste("Vaidik");
+                profile5.setMotherTongue("Bengali");
+                profile5.setMaritalStatus(MaritalStatus.NEVER_MARRIED);
+                profile5.setLocation("Barrackpore, West Bengal");
+                profile5.setEducation("12th");
+                profile5.setOccupation("Unemployed");
+                profile5.setCompanyName("None");
+                profile5.setSalary("0 - 5 Lakhs");
+                profile5.setFoodPreference("Vegetarian");
+                profile5.setAboutMe("I have completed my 12th standard education and am currently seeking opportunities. I love spending time in nature, painting, and wearing traditional attire.");
+                profile5.setPartnerPreferences("Looking for an educated, caring, and well-behaved Brahmin partner.");
+
+                profileRepository.save(profile5);
+
+                // Create Photo 1 (Primary profile photo)
+                Photo photo1 = new Photo();
+                photo1.setUser(user5);
+                photo1.setType(PhotoType.PROFILE);
+                photo1.setUrl("http://localhost:5173/sneha1.jpg");
+                photo1.setApproved(true);
+                photoRepository.save(photo1);
+
+                // Create Photo 2 (Second profile photo)
+                Photo photo2 = new Photo();
+                photo2.setUser(user5);
+                photo2.setType(PhotoType.PROFILE);
+                photo2.setUrl("http://localhost:5173/sneha2.jpg");
+                photo2.setApproved(true);
+                photoRepository.save(photo2);
+            }
         };
     }
 }
