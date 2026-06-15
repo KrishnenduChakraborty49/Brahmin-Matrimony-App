@@ -319,6 +319,47 @@ public class BrahminMilanApplication {
                 photo2.setApproved(true);
                 photoRepository.save(photo2);
             }
+
+            // 7. Seed/Update profile for the main test user (chakrabortykrishnandu49@gmail.com)
+            String mainUserEmail = "chakrabortykrishnandu49@gmail.com";
+            User mainUser;
+            if (!userRepository.existsByEmail(mainUserEmail)) {
+                mainUser = new User();
+                mainUser.setEmail(mainUserEmail);
+                mainUser.setPassword(passwordEncoder.encode("password123")); // Default password
+                mainUser.setVerified(true);
+
+                Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                        .orElseThrow(() -> new RuntimeException("Role ROLE_USER not found"));
+
+                Set<Role> roles = new HashSet<>();
+                roles.add(userRole);
+                mainUser.setRoles(roles);
+                userRepository.save(mainUser);
+            } else {
+                mainUser = userRepository.findByEmail(mainUserEmail).get();
+            }
+
+            // Seed/Update his profile so match scores calculate correctly
+            Profile mainProfile = profileRepository.findByUserId(mainUser.getId()).orElse(new Profile());
+            mainProfile.setUser(mainUser);
+            if (mainProfile.getFullName() == null || mainProfile.getFullName().isEmpty()) {
+                mainProfile.setFullName("Krishnendu Chakraborty");
+            }
+            mainProfile.setGender(Gender.MALE);
+            mainProfile.setDob(LocalDate.of(2000, 1, 1));
+            mainProfile.setHeight(5.8);
+            mainProfile.setSubCaste("Vaidik");
+            mainProfile.setMotherTongue("Bengali");
+            mainProfile.setMaritalStatus(MaritalStatus.NEVER_MARRIED);
+            mainProfile.setLocation("Guskara, West Bengal");
+            mainProfile.setEducation("B.Sc");
+            mainProfile.setOccupation("Software Engineer");
+            mainProfile.setCompanyName("Tech Corp");
+            mainProfile.setSalary("10 - 20 Lakhs");
+            mainProfile.setFoodPreference("Vegetarian");
+            mainProfile.setAboutMe("I am a software professional looking for a life partner.");
+            profileRepository.save(mainProfile);
         };
     }
 }

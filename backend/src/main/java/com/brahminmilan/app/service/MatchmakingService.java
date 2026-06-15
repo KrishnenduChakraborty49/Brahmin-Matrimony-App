@@ -114,8 +114,13 @@ public class MatchmakingService {
 
         // 2. Education compatibility (20 points)
         if (userProfile.getEducation() != null && targetProfile.getEducation() != null) {
-            if (userProfile.getEducation().equalsIgnoreCase(targetProfile.getEducation())) {
+            String edu1 = userProfile.getEducation().toLowerCase();
+            String edu2 = targetProfile.getEducation().toLowerCase();
+            if (edu1.equals(edu2)) {
                 score += 20;
+            } else if ((edu1.contains("b.sc") || edu1.contains("b.a") || edu1.contains("b.tech") || edu1.contains("bachelor")) && 
+                       (edu2.contains("b.sc") || edu2.contains("b.a") || edu2.contains("b.tech") || edu2.contains("bachelor"))) {
+                score += 15; // Both have Bachelor's degrees
             } else {
                 score += 10; // Partial match for having education info
             }
@@ -123,19 +128,23 @@ public class MatchmakingService {
 
         // 3. Location compatibility (20 points)
         if (userProfile.getLocation() != null && targetProfile.getLocation() != null) {
-            if (userProfile.getLocation().equalsIgnoreCase(targetProfile.getLocation())) {
+            String loc1 = userProfile.getLocation().toLowerCase();
+            String loc2 = targetProfile.getLocation().toLowerCase();
+            if (loc1.equals(loc2)) {
                 score += 20;
+            } else if (loc1.contains("west bengal") && loc2.contains("west bengal")) {
+                score += 15; // Same state match
             } else {
                 score += 5; // Both have location specified
             }
         }
 
-        // 4. Sub-caste / Gotra Check (Brahmin strict rule: Should NOT be same sub-caste for some traditions)
+        // 4. Sub-caste Check (Brahmin matching rule: Preferred to be same sub-caste)
         if (userProfile.getSubCaste() != null && targetProfile.getSubCaste() != null) {
             if (userProfile.getSubCaste().equalsIgnoreCase(targetProfile.getSubCaste())) {
-                score -= 50; // Huge penalty for same sub-caste (gotra equivalent)
+                score += 20; // Bonus for same sub-caste
             } else {
-                score += 20; // Bonus for different sub-caste
+                score += 5; // Minor match for both being Brahmin
             }
         }
 
