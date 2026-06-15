@@ -209,6 +209,61 @@ public class BrahminMilanApplication {
                 photo2.setApproved(true);
                 photoRepository.save(photo2);
             }
+
+            // 5. Seed default girl profile (Nandita Mishra)
+            String email4 = "nandita.mishra@gmail.com";
+            if (!userRepository.existsByEmail(email4)) {
+                User user4 = new User();
+                user4.setEmail(email4);
+                user4.setPassword(passwordEncoder.encode("password123"));
+                user4.setVerified(true);
+
+                Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                        .orElseThrow(() -> new RuntimeException("Role ROLE_USER not found"));
+
+                Set<Role> roles = new HashSet<>();
+                roles.add(userRole);
+                user4.setRoles(roles);
+
+                userRepository.save(user4);
+
+                // Create Profile
+                Profile profile4 = new Profile();
+                profile4.setUser(user4);
+                profile4.setFullName("Nandita Mishra");
+                profile4.setGender(Gender.FEMALE);
+                profile4.setDob(LocalDate.of(2003, 4, 12));
+                profile4.setHeight(5.3);
+                profile4.setSubCaste("Kulin");
+                profile4.setMotherTongue("Bengali");
+                profile4.setMaritalStatus(MaritalStatus.NEVER_MARRIED);
+                profile4.setLocation("Durgapur, West Bengal");
+                profile4.setEducation("B.A in History");
+                profile4.setOccupation("Unemployed");
+                profile4.setCompanyName("None");
+                profile4.setSalary("0 - 5 Lakhs");
+                profile4.setFoodPreference("Vegetarian");
+                profile4.setAboutMe("I graduated with a B.A. in History and am currently looking for job opportunities. I enjoy reading historical novels, craftwork, and classical music.");
+                profile4.setPartnerPreferences("Looking for an educated, understanding, and loving Brahmin partner from West Bengal.");
+
+                profileRepository.save(profile4);
+
+                // Create Photo 1 (Primary profile photo)
+                Photo photo1 = new Photo();
+                photo1.setUser(user4);
+                photo1.setType(PhotoType.PROFILE);
+                photo1.setUrl("http://localhost:5173/nandita1.jpg");
+                photo1.setApproved(true);
+                photoRepository.save(photo1);
+
+                // Create Photo 2 (Second profile photo)
+                Photo photo2 = new Photo();
+                photo2.setUser(user4);
+                photo2.setType(PhotoType.PROFILE);
+                photo2.setUrl("http://localhost:5173/nandita2.jpg");
+                photo2.setApproved(true);
+                photoRepository.save(photo2);
+            }
         };
     }
 }
