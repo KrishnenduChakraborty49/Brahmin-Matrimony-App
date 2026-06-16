@@ -22,13 +22,16 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
 
+    private boolean isSuspended;
+
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String email, String password,
+    public UserDetailsImpl(Long id, String email, String password, boolean isSuspended,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.password = password;
+        this.isSuspended = isSuspended;
         this.authorities = authorities;
     }
 
@@ -41,6 +44,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
+                user.isSuspended(),
                 authorities);
     }
 
@@ -76,7 +80,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true; // We can integrate isVerified here if needed
+        return !isSuspended;
     }
 
     @Override

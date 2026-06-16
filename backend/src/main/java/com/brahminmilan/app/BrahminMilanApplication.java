@@ -323,21 +323,30 @@ public class BrahminMilanApplication {
             // 7. Seed/Update profile for the main test user (chakrabortykrishnandu49@gmail.com)
             String mainUserEmail = "chakrabortykrishnandu49@gmail.com";
             User mainUser;
+            Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException("Role ROLE_USER not found"));
+            Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
+                    .orElseThrow(() -> new RuntimeException("Role ROLE_ADMIN not found"));
+
             if (!userRepository.existsByEmail(mainUserEmail)) {
                 mainUser = new User();
                 mainUser.setEmail(mainUserEmail);
                 mainUser.setPassword(passwordEncoder.encode("password123")); // Default password
                 mainUser.setVerified(true);
 
-                Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-                        .orElseThrow(() -> new RuntimeException("Role ROLE_USER not found"));
-
                 Set<Role> roles = new HashSet<>();
                 roles.add(userRole);
+                roles.add(adminRole);
                 mainUser.setRoles(roles);
                 userRepository.save(mainUser);
             } else {
                 mainUser = userRepository.findByEmail(mainUserEmail).get();
+                Set<Role> roles = mainUser.getRoles();
+                if (roles.stream().noneMatch(r -> r.getName() == RoleName.ROLE_ADMIN)) {
+                    roles.add(adminRole);
+                    mainUser.setRoles(roles);
+                    userRepository.save(mainUser);
+                }
             }
 
             // Seed/Update his profile so match scores calculate correctly
