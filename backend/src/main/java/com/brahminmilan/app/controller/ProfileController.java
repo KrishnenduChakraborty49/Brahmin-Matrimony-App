@@ -30,6 +30,15 @@ public class ProfileController {
         }
     }
 
+    @GetMapping("/me/photos")
+    public ResponseEntity<?> getMyPhotos(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            return ResponseEntity.ok(profileService.getMyPhotos(userDetails.getId()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
+    }
+
     @PutMapping("/me")
     public ResponseEntity<?> updateMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                              @RequestBody ProfileDto profileDto) {

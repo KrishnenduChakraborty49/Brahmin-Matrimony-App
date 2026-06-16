@@ -138,6 +138,10 @@ public class ProfileService {
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
     }
 
+    public List<Photo> getMyPhotos(Long userId) {
+        return photoRepository.findByUserId(userId);
+    }
+
     @Transactional
     public Photo uploadPhoto(Long userId, MultipartFile file, PhotoType type) {
         User user = userRepository.findById(userId)
