@@ -14,6 +14,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import com.brahminmilan.app.entity.User;
+import com.brahminmilan.app.entity.Profile;
+import com.brahminmilan.app.entity.Photo;
+import com.brahminmilan.app.entity.PhotoType;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -26,6 +34,15 @@ public class ChatController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
+    @Autowired
+    private com.brahminmilan.app.repository.ProfileRepository profileRepository;
+
+    @Autowired
+    private com.brahminmilan.app.repository.PhotoRepository photoRepository;
+
+    @Autowired
+    private com.brahminmilan.app.repository.MessageRepository messageRepository;
+
     @PostMapping("/init/{receiverId}")
     public ResponseEntity<Chat> initChat(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                          @PathVariable Long receiverId) {
@@ -34,13 +51,63 @@ public class ChatController {
     }
 
     @GetMapping("/my-chats")
-    public ResponseEntity<List<Chat>> getMyChats(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(chatService.getUserChats(userDetails.getId()));
+    public ResponseEntity<?> getMyChats(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<Chat> chats = chatService.getUserChats(userDetails.getId());
+        List<Map<String, Object>> response = new ArrayList<>();
+
+        for (Chat chat : chats) {
+            User recipient = chat.getUser1().getId().equals(userDetails.getId()) ? chat.getUser2() : chat.getUser1();
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", chat.getId());
+            map.put("recipientId", recipient.getId());
+            map.put("recipientEmail", recipient.getEmail());
+
+            // Get profile name
+            Optional<Profile> profileOpt = profileRepository.findByUserId(recipient.getId());
+            if (profileOpt.isPresent()) {
+                map.put("recipientName", profileOpt.get().getFullName());
+            } else {
+                map.put("recipientName", recipient.getEmail());
+            }
+
+            // Get approved profile picture
+            List<Photo> photos = photoRepository.findByUserIdAndType(recipient.getId(), PhotoType.PROFILE);
+            String avatarUrl = null;
+            for (Photo photo : photos) {
+                if (photo.isApproved()) {
+                    avatarUrl = photo.getUrl();
+                    break;
+                }
+            }
+            if (avatarUrl == null && !photos.isEmpty()) {
+                avatarUrl = photos.get(0).getUrl();
+            }
+            map.put("recipientAvatar", avatarUrl);
+
+            // Get last message details
+            List<Message> messages = chatService.getChatHistory(chat.getId());
+            String lastMessage = "";
+            java.time.LocalDateTime lastMessageTime = chat.getUpdatedAt() != null ? chat.getUpdatedAt() : chat.getCreatedAt();
+
+            if (!messages.isEmpty()) {
+                Message last = messages.get(messages.size() - 1);
+                lastMessage = last.getContent();
+                lastMessageTime = last.getCreatedAt();
+            }
+
+            map.put("lastMessage", lastMessage);
+            map.put("lastMessageTime", lastMessageTime);
+
+            response.add(map);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{chatId}/messages")
-    public ResponseEntity<List<Message>> getChatMessages(@PathVariable Long chatId) {
-        return ResponseEntity.ok(chatService.getChatHistory(chatId));
+    public ResponseEntity<List<Message>> getChatHistory(@PathVariable Long chatId) {
+        List<Message> history = chatService.getChatHistory(chatId);
+        return ResponseEntity.ok(history);
     }
 
     // WebSocket Endpoint for real-time messaging

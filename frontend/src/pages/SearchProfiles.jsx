@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Filter, Search, Heart, MapPin, Briefcase, Star, Loader, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../api';
 
 const ProfileCard = ({ profile }) => {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const navigate = useNavigate();
 
   const photoUrls = profile.photoUrls && profile.photoUrls.length > 0
     ? profile.photoUrls
@@ -84,7 +86,17 @@ const ProfileCard = ({ profile }) => {
         </div>
         
         <div className="flex gap-2">
-          <button className="flex-1 py-2.5 bg-matrimony-50 text-matrimony-600 font-semibold rounded-xl hover:bg-matrimony-100 transition flex items-center justify-center">
+          <button 
+            onClick={async () => {
+              try {
+                const res = await api.post(`/chat/init/${profile.userId}`);
+                navigate(`/chat?chatId=${res.data.id}`);
+              } catch (err) {
+                console.error("Failed to initiate chat", err);
+              }
+            }}
+            className="flex-1 py-2.5 bg-matrimony-50 text-matrimony-600 font-semibold rounded-xl hover:bg-matrimony-100 transition flex items-center justify-center"
+          >
             <Heart className="w-4 h-4 mr-2" /> Connect
           </button>
           <button className="p-2.5 border border-gray-200 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-xl transition flex items-center justify-center">
