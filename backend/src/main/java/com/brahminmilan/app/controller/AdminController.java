@@ -2,6 +2,7 @@ package com.brahminmilan.app.controller;
 
 import com.brahminmilan.app.entity.*;
 import com.brahminmilan.app.repository.*;
+import com.brahminmilan.app.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +28,9 @@ public class AdminController {
 
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/stats")
     public ResponseEntity<?> getStats() {
@@ -164,6 +168,9 @@ public class AdminController {
         Photo photo = photoOpt.get();
         photo.setApproved(true);
         photoRepository.save(photo);
+        
+        notificationService.createNotification(photo.getUser(), "Your " + photo.getType().name().toLowerCase() + " photo has been approved by the admin.");
+        
         return ResponseEntity.ok(Map.of("message", "Photo approved successfully"));
     }
 
@@ -173,7 +180,11 @@ public class AdminController {
         if (photoOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Photo not found"));
         }
-        photoRepository.delete(photoOpt.get());
+        Photo photo = photoOpt.get();
+        photoRepository.delete(photo);
+        
+        notificationService.createNotification(photo.getUser(), "Your " + photo.getType().name().toLowerCase() + " photo has been rejected and deleted by the admin.");
+        
         return ResponseEntity.ok(Map.of("message", "Photo rejected and deleted successfully"));
     }
 }

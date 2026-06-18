@@ -26,6 +26,9 @@ public class MatchmakingService {
     @Autowired
     private ProfileRepository profileRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Transactional
     public Interest sendInterest(Long senderId, Long receiverId) {
         if (senderId.equals(receiverId)) {
@@ -46,7 +49,15 @@ public class MatchmakingService {
         Interest interest = new Interest();
         interest.setSender(sender);
         interest.setReceiver(receiver);
-        return interestRepository.save(interest);
+        Interest saved = interestRepository.save(interest);
+
+        // Notify the receiver
+        String senderName = profileRepository.findByUserId(senderId)
+                .map(Profile::getFullName)
+                .orElse(sender.getEmail());
+        notificationService.createNotification(receiver, senderName + " has sent you a connection interest!");
+
+        return saved;
     }
 
     @Transactional
@@ -58,7 +69,17 @@ public class MatchmakingService {
         }
 
         interest.setStatus(status);
-        return interestRepository.save(interest);
+        Interest saved = interestRepository.save(interest);
+
+        // Notify the sender if status is ACCEPTED
+        if (status == InterestStatus.ACCEPTED) {
+            String receiverName = profileRepository.findByUserId(receiverId)
+                    .map(Profile::getFullName)
+                    .orElse(interest.getReceiver().getEmail());
+            notificationService.createNotification(interest.getSender(), receiverName + " has accepted your connection interest!");
+        }
+
+        return saved;
     }
 
     @Transactional
@@ -150,5 +171,10 @@ public class MatchmakingService {
 
         // Bound the score between 0 and 100
         return Math.max(0, Math.min(100, score));
+    }
+
+    public List<Shortlist> getUserShortlist(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return shortlistRepository.findByUser(user);
     }
 }
