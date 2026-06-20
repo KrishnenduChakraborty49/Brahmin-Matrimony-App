@@ -42,7 +42,12 @@ public class MatchmakingController {
 
     @GetMapping("/interests/received")
     public ResponseEntity<?> getReceivedInterests(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(matchmakingService.getReceivedInterests(userDetails.getId()));
+        return ResponseEntity.ok(matchmakingService.getEnrichedReceivedInterests(userDetails.getId()));
+    }
+
+    @GetMapping("/interests/sent")
+    public ResponseEntity<?> getSentInterests(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(matchmakingService.getEnrichedSentInterests(userDetails.getId()));
     }
 
     @PostMapping("/shortlist/{profileId}")
@@ -51,6 +56,22 @@ public class MatchmakingController {
         try {
             matchmakingService.shortlistProfile(userDetails.getId(), profileId);
             return ResponseEntity.ok(new MessageResponse("Profile shortlisted successfully"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/shortlist")
+    public ResponseEntity<?> getShortlist(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(matchmakingService.getEnrichedShortlist(userDetails.getId()));
+    }
+
+    @DeleteMapping("/shortlist/{profileId}")
+    public ResponseEntity<?> removeShortlist(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                             @PathVariable Long profileId) {
+        try {
+            matchmakingService.removeShortlistByProfile(userDetails.getId(), profileId);
+            return ResponseEntity.ok(new MessageResponse("Profile removed from shortlist"));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }

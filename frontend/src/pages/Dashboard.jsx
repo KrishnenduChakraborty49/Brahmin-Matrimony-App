@@ -457,7 +457,7 @@ const Dashboard = () => {
             {/* Action Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div 
-                onClick={() => navigate('/search')}
+                onClick={() => navigate('/interests?tab=received')}
                 className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100 flex flex-col items-center justify-center hover:shadow-md cursor-pointer transition"
               >
                 <div className="w-12 h-12 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mb-3">
@@ -468,7 +468,7 @@ const Dashboard = () => {
               </div>
               
               <div 
-                onClick={() => navigate('/search')}
+                onClick={() => navigate('/shortlisted?tab=shortlist')}
                 className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100 flex flex-col items-center justify-center hover:shadow-md cursor-pointer transition"
               >
                 <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-3">

@@ -12,6 +12,7 @@ import SearchProfiles from './pages/SearchProfiles';
 import ChatWindow from './pages/ChatWindow';
 import SubscriptionPlans from './pages/SubscriptionPlans';
 import AdminDashboard from './pages/AdminDashboard';
+import InterestsShortlist from './pages/InterestsShortlist';
 
 const PrivateRoute = ({ children }) => {
     const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
@@ -69,6 +70,8 @@ const AppRouter = () => {
                         <Route path="/profile/edit" element={<PrivateRoute><ProfileForm /></PrivateRoute>} />
                         <Route path="/search" element={<PrivateRoute><SearchProfiles /></PrivateRoute>} />
                         <Route path="/chat" element={<PrivateRoute><ChatWindow /></PrivateRoute>} />
+                        <Route path="/interests" element={<PrivateRoute><InterestsShortlist /></PrivateRoute>} />
+                        <Route path="/shortlisted" element={<PrivateRoute><InterestsShortlist /></PrivateRoute>} />
                         <Route path="/upgrade" element={<PrivateRoute><SubscriptionPlans /></PrivateRoute>} />
                         <Route path="/admin" element={<PrivateRoute>{isAdmin ? <AdminDashboard /> : <Navigate to="/dashboard" />}</PrivateRoute>} />
                     </Routes>

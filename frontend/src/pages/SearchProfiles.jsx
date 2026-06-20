@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Filter, Search, Heart, MapPin, Briefcase, Star, Loader, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../api';
 
-const ProfileCard = ({ profile }) => {
+const ProfileCard = ({ profile, isShortlisted, onToggleShortlist }) => {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const navigate = useNavigate();
 
@@ -99,8 +99,15 @@ const ProfileCard = ({ profile }) => {
           >
             <Heart className="w-4 h-4 mr-2" /> Connect
           </button>
-          <button className="p-2.5 border border-gray-200 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-xl transition flex items-center justify-center">
-            <Star className="w-5 h-5" />
+          <button 
+            onClick={onToggleShortlist}
+            className={`p-2.5 border rounded-xl transition flex items-center justify-center ${
+              isShortlisted 
+                ? 'bg-yellow-50 border-yellow-200 text-yellow-500' 
+                : 'border-gray-200 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50/50'
+            }`}
+          >
+            <Star className={`w-5 h-5 ${isShortlisted ? 'fill-current' : ''}`} />
           </button>
         </div>
       </div>
@@ -110,22 +117,27 @@ const ProfileCard = ({ profile }) => {
 
 const SearchProfiles = () => {
   const [profiles, setProfiles] = useState([]);
+  const [shortlistedIds, setShortlistedIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchMatches = async () => {
+    const fetchMatchesAndShortlist = async () => {
       try {
         const response = await api.get('/profiles');
         setProfiles(response.data || []);
+        
+        const shortlistRes = await api.get('/matchmaking/shortlist');
+        const ids = new Set((shortlistRes.data || []).map(item => item.profileId));
+        setShortlistedIds(ids);
       } catch (err) {
         setError('Failed to load matches. Please make sure the backend is running.');
       } finally {
         setLoading(false);
       }
     };
-    fetchMatches();
+    fetchMatchesAndShortlist();
   }, []);
 
   const filteredProfiles = profiles.filter(profile => {
@@ -183,7 +195,33 @@ const SearchProfiles = () => {
         /* Grid of Profiles */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredProfiles.map(profile => (
-            <ProfileCard key={profile.id} profile={profile} />
+            <ProfileCard 
+              key={profile.id} 
+              profile={profile} 
+              isShortlisted={shortlistedIds.has(profile.id)}
+              onToggleShortlist={async () => {
+                const alreadyShortlisted = shortlistedIds.has(profile.id);
+                try {
+                  if (alreadyShortlisted) {
+                    await api.delete(`/matchmaking/shortlist/${profile.id}`);
+                    setShortlistedIds(prev => {
+                      const next = new Set(prev);
+                      next.delete(profile.id);
+                      return next;
+                    });
+                  } else {
+                    await api.post(`/matchmaking/shortlist/${profile.id}`);
+                    setShortlistedIds(prev => {
+                      const next = new Set(prev);
+                      next.add(profile.id);
+                      return next;
+                    });
+                  }
+                } catch (err) {
+                  console.error('Failed to toggle shortlist:', err);
+                }
+              }}
+            />
           ))}
         </div>
       )}
