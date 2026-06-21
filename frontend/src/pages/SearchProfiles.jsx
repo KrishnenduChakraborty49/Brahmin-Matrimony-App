@@ -123,6 +123,12 @@ const SearchProfiles = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('query');
+    if (q) {
+      setSearchTerm(q);
+    }
+
     const fetchMatchesAndShortlist = async () => {
       try {
         const response = await api.get('/profiles');
