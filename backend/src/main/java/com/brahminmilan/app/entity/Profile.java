@@ -65,6 +65,19 @@ public class Profile {
     @Column(name = "partner_preferences", columnDefinition = "TEXT")
     private String partnerPreferences;
 
+    @Column(name = "birth_time")
+    private String birthTime;
+
+    @Column(name = "birth_place")
+    private String birthPlace;
+
+    private String rashi;
+
+    private String nakshatra;
+
+    @Column(name = "manglik_status")
+    private String manglikStatus;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

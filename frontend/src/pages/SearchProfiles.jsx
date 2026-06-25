@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Filter, Search, Heart, MapPin, Briefcase, Star, Loader, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Filter, Search, Heart, MapPin, Briefcase, Star, Loader, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import api from '../api';
+import AstrologyModal from '../components/AstrologyModal';
 
-const ProfileCard = ({ profile, isShortlisted, onToggleShortlist }) => {
+const ProfileCard = ({ profile, isShortlisted, onToggleShortlist, onCheckAstro }) => {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const navigate = useNavigate();
 
@@ -85,6 +86,14 @@ const ProfileCard = ({ profile, isShortlisted, onToggleShortlist }) => {
           </div>
         </div>
         
+        <button 
+          onClick={onCheckAstro}
+          className="w-full mb-3 py-2 bg-gradient-to-r from-rose-50 to-pink-50 hover:from-rose-100 hover:to-pink-100 border border-rose-100/50 text-rose-700 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-rose-500" />
+          Check Kundali Match
+        </button>
+
         <div className="flex gap-2">
           <button 
             onClick={async () => {
@@ -121,6 +130,20 @@ const SearchProfiles = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
+  const [selectedAstroProfile, setSelectedAstroProfile] = useState(null);
+  const [currentUserProfile, setCurrentUserProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const res = await api.get('/profiles/me');
+        setCurrentUserProfile(res.data);
+      } catch (err) {
+        console.error('Error fetching current user profile:', err);
+      }
+    };
+    fetchCurrentUser();
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -205,6 +228,7 @@ const SearchProfiles = () => {
               key={profile.id} 
               profile={profile} 
               isShortlisted={shortlistedIds.has(profile.id)}
+              onCheckAstro={() => setSelectedAstroProfile(profile)}
               onToggleShortlist={async () => {
                 const alreadyShortlisted = shortlistedIds.has(profile.id);
                 try {
@@ -231,6 +255,13 @@ const SearchProfiles = () => {
           ))}
         </div>
       )}
+
+      <AstrologyModal 
+        isOpen={!!selectedAstroProfile}
+        onClose={() => setSelectedAstroProfile(null)}
+        targetProfile={selectedAstroProfile}
+        currentUserProfile={currentUserProfile}
+      />
     </div>
   );
 };

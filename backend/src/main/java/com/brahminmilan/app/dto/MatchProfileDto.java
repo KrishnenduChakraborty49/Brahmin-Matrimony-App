@@ -26,4 +26,9 @@ public class MatchProfileDto {
     private String photoUrl;
     private java.util.List<String> photoUrls;
     private int matchScore;
+    private String birthTime;
+    private String birthPlace;
+    private String rashi;
+    private String nakshatra;
+    private String manglikStatus;
 }

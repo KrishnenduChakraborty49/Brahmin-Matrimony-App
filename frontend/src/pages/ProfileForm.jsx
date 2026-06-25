@@ -19,7 +19,12 @@ const ProfileForm = () => {
     salary: '',
     foodPreference: 'Vegetarian',
     aboutMe: '',
-    partnerPreferences: ''
+    partnerPreferences: '',
+    birthTime: '',
+    birthPlace: '',
+    rashi: 'Aries',
+    nakshatra: 'Ashwini',
+    manglikStatus: 'NON_MANGLIK'
   });
 
   const [loading, setLoading] = useState(true);
@@ -49,7 +54,12 @@ const ProfileForm = () => {
             salary: p.salary || '',
             foodPreference: p.foodPreference || 'Vegetarian',
             aboutMe: p.aboutMe || '',
-            partnerPreferences: p.partnerPreferences || ''
+            partnerPreferences: p.partnerPreferences || '',
+            birthTime: p.birthTime || '',
+            birthPlace: p.birthPlace || '',
+            rashi: p.rashi || 'Aries',
+            nakshatra: p.nakshatra || 'Ashwini',
+            manglikStatus: p.manglikStatus || 'NON_MANGLIK'
           });
         }
       } catch (err) {
@@ -312,6 +322,111 @@ const ProfileForm = () => {
             </div>
           </div>
           
+          {/* Astrological & Birth Details */}
+          <div className="bg-white rounded-3xl border border-gray-100 p-1 md:p-2">
+            <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">Astrological & Birth Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Birth Time</label>
+                <input 
+                  type="time" 
+                  name="birthTime"
+                  value={formData.birthTime}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-gray-300 bg-gray-50 border py-2.5 px-4 focus:ring-matrimony-500 focus:border-matrimony-500" 
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Birth Place</label>
+                <input 
+                  type="text" 
+                  name="birthPlace"
+                  value={formData.birthPlace}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-gray-300 bg-gray-50 border py-2.5 px-4 focus:ring-matrimony-500 focus:border-matrimony-500" 
+                  placeholder="e.g. Kolkata, West Bengal"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Rashi (Moon Sign)</label>
+                <select 
+                  name="rashi"
+                  value={formData.rashi}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-gray-300 bg-gray-50 border py-2.5 px-4 focus:ring-matrimony-500 focus:border-matrimony-500"
+                >
+                  <option value="Aries">Aries (Mesha)</option>
+                  <option value="Taurus">Taurus (Vrishabha)</option>
+                  <option value="Gemini">Gemini (Mithuna)</option>
+                  <option value="Cancer">Cancer (Karka)</option>
+                  <option value="Leo">Leo (Simha)</option>
+                  <option value="Virgo">Virgo (Kanya)</option>
+                  <option value="Libra">Libra (Tula)</option>
+                  <option value="Scorpio">Scorpio (Vrishchika)</option>
+                  <option value="Sagittarius">Sagittarius (Dhanu)</option>
+                  <option value="Capricorn">Capricorn (Makara)</option>
+                  <option value="Aquarius">Aquarius (Kumbha)</option>
+                  <option value="Pisces">Pisces (Meena)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nakshatra (Birth Star)</label>
+                <select 
+                  name="nakshatra"
+                  value={formData.nakshatra}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-gray-300 bg-gray-50 border py-2.5 px-4 focus:ring-matrimony-500 focus:border-matrimony-500"
+                >
+                  <option value="Ashwini">Ashwini</option>
+                  <option value="Bharani">Bharani</option>
+                  <option value="Krittika">Krittika</option>
+                  <option value="Rohini">Rohini</option>
+                  <option value="Mrigashira">Mrigashira</option>
+                  <option value="Ardra">Ardra</option>
+                  <option value="Punarvasu">Punarvasu</option>
+                  <option value="Pushya">Pushya</option>
+                  <option value="Ashlesha">Ashlesha</option>
+                  <option value="Magha">Magha</option>
+                  <option value="Purva Phalguni">Purva Phalguni</option>
+                  <option value="Uttara Phalguni">Uttara Phalguni</option>
+                  <option value="Hasta">Hasta</option>
+                  <option value="Chitra">Chitra</option>
+                  <option value="Swati">Swati</option>
+                  <option value="Vishakha">Vishakha</option>
+                  <option value="Anuradha">Anuradha</option>
+                  <option value="Jyeshtha">Jyeshtha</option>
+                  <option value="Moola">Moola</option>
+                  <option value="Purva Ashadha">Purva Ashadha</option>
+                  <option value="Uttara Ashadha">Uttara Ashadha</option>
+                  <option value="Shravana">Shravana</option>
+                  <option value="Dhanishta">Dhanishta</option>
+                  <option value="Shatabhisha">Shatabhisha</option>
+                  <option value="Purva Bhadrapada">Purva Bhadrapada</option>
+                  <option value="Uttara Bhadrapada">Uttara Bhadrapada</option>
+                  <option value="Revati">Revati</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Manglik Status</label>
+                <select 
+                  name="manglikStatus"
+                  value={formData.manglikStatus}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-gray-300 bg-gray-50 border py-2.5 px-4 focus:ring-matrimony-500 focus:border-matrimony-500"
+                >
+                  <option value="NON_MANGLIK">Non-Manglik</option>
+                  <option value="MANGLIK">Manglik</option>
+                  <option value="ANSHIK_MANGLIK">Anshik Manglik (Partial)</option>
+                  <option value="UNKNOWN">Unknown / Don't Know</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           {/* About Me & Partner Preferences */}
           <div className="space-y-6">
             <div>

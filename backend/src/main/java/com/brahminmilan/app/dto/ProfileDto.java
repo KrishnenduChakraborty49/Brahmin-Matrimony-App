@@ -23,4 +23,9 @@ public class ProfileDto {
     private String foodPreference;
     private String aboutMe;
     private String partnerPreferences;
+    private String birthTime;
+    private String birthPlace;
+    private String rashi;
+    private String nakshatra;
+    private String manglikStatus;
 }

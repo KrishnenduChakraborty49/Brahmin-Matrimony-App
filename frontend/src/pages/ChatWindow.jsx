@@ -10,6 +10,7 @@ import {
 import api from '../api';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
+import AstrologyModal from '../components/AstrologyModal';
 
 const ChatWindow = () => {
   const [chats, setChats] = useState([]);
@@ -29,6 +30,8 @@ const ChatWindow = () => {
   const [activeTheme, setActiveTheme] = useState('default');
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [selectedAstroProfile, setSelectedAstroProfile] = useState(null);
+  const [currentUserProfile, setCurrentUserProfile] = useState(null);
 
   // Call Simulation State
   const [callType, setCallType] = useState(null); // 'voice' | 'video' | null
@@ -89,6 +92,13 @@ const ChatWindow = () => {
         setUserStats(statsRes.data);
       } catch (err) {
         console.error('Error fetching user dashboard stats:', err);
+      }
+
+      try {
+        const meRes = await api.get('/profiles/me');
+        setCurrentUserProfile(meRes.data);
+      } catch (err) {
+        console.error('Error fetching own profile for Guna Milan:', err);
       }
     };
 
@@ -696,7 +706,16 @@ const ChatWindow = () => {
                         )}
                       </div>
 
-                      {/* Action Button */}
+                      {/* Action Buttons */}
+                      <button 
+                        onClick={() => setSelectedAstroProfile(activeRecipientProfile)}
+                        disabled={!activeRecipientProfile}
+                        className="w-full mb-3 py-2.5 px-4 bg-gradient-to-r from-rose-50 to-pink-50 hover:from-rose-100 hover:to-pink-100 border border-rose-100/50 text-rose-700 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer disabled:opacity-50"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
+                        Check Astro Compatibility
+                      </button>
+
                       <button 
                         onClick={() => navigate('/search')}
                         className="w-full py-2.5 px-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl font-bold text-xs text-gray-700 transition flex items-center justify-center gap-1.5"
@@ -939,6 +958,14 @@ const ChatWindow = () => {
           </div>
         </div>
       )}
+
+      {/* Astrology Kundali Modal */}
+      <AstrologyModal 
+        isOpen={!!selectedAstroProfile}
+        onClose={() => setSelectedAstroProfile(null)}
+        targetProfile={selectedAstroProfile}
+        currentUserProfile={currentUserProfile}
+      />
     </div>
   );
 };

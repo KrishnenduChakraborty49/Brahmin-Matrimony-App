@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Heart, Star, MessageSquare, MapPin, Briefcase, User, Sparkles, Loader, Check, X, ShieldAlert } from 'lucide-react';
 import api from '../api';
+import AstrologyModal from '../components/AstrologyModal';
 
 const InterestsShortlist = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,6 +20,20 @@ const InterestsShortlist = () => {
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [selectedAstroProfile, setSelectedAstroProfile] = useState(null);
+  const [currentUserProfile, setCurrentUserProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const res = await api.get('/profiles/me');
+        setCurrentUserProfile(res.data);
+      } catch (err) {
+        console.error('Error fetching current user profile in shortlist:', err);
+      }
+    };
+    fetchCurrentUser();
+  }, []);
 
   // Sync tab query param with state
   useEffect(() => {
@@ -360,7 +375,16 @@ const InterestsShortlist = () => {
                       </div>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-gray-50 flex gap-2 w-full">
+                    <div className="mt-6 pt-4 border-t border-gray-50 flex flex-col justify-between">
+                      <button 
+                        onClick={() => setSelectedAstroProfile(item)}
+                        className="w-full mb-3 py-1.5 bg-rose-50/50 hover:bg-rose-100/50 text-[10px] font-bold text-rose-700 border border-rose-100/40 rounded-xl transition flex items-center justify-center gap-1 active:scale-95 cursor-pointer font-semibold"
+                      >
+                        <Sparkles className="w-3 h-3 text-rose-500" />
+                        Check Kundali Match
+                      </button>
+
+                      <div className="flex gap-2 w-full">
                       <button
                         disabled={actionLoadingId === item.profileId}
                         onClick={() => handleConnectFromShortlist(item)}
@@ -389,13 +413,21 @@ const InterestsShortlist = () => {
                     </div>
                   </div>
                 </div>
-              ))
+              </div>
+            ))
             )
           )}
 
         </div>
       )}
 
+      {/* Astrology Kundali Modal */}
+      <AstrologyModal 
+        isOpen={!!selectedAstroProfile}
+        onClose={() => setSelectedAstroProfile(null)}
+        targetProfile={selectedAstroProfile}
+        currentUserProfile={currentUserProfile}
+      />
     </div>
   );
 };

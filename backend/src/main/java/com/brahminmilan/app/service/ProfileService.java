@@ -65,6 +65,11 @@ public class ProfileService {
             dto.setSalary(p.getSalary());
             dto.setFoodPreference(p.getFoodPreference());
             dto.setAboutMe(p.getAboutMe());
+            dto.setBirthTime(p.getBirthTime());
+            dto.setBirthPlace(p.getBirthPlace());
+            dto.setRashi(p.getRashi());
+            dto.setNakshatra(p.getNakshatra());
+            dto.setManglikStatus(p.getManglikStatus());
 
             // Fetch profile pictures if approved, else fallback to first or empty
             List<Photo> photos = photoRepository.findByUserIdAndType(p.getUser().getId(), PhotoType.PROFILE);
@@ -129,6 +134,11 @@ public class ProfileService {
         profile.setFoodPreference(profileDto.getFoodPreference());
         profile.setAboutMe(profileDto.getAboutMe());
         profile.setPartnerPreferences(profileDto.getPartnerPreferences());
+        profile.setBirthTime(profileDto.getBirthTime());
+        profile.setBirthPlace(profileDto.getBirthPlace());
+        profile.setRashi(profileDto.getRashi());
+        profile.setNakshatra(profileDto.getNakshatra());
+        profile.setManglikStatus(profileDto.getManglikStatus());
 
         return profileRepository.save(profile);
     }

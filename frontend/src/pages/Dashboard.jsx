@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../api';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
+import AstrologyModal from '../components/AstrologyModal';
 
 const Dashboard = () => {
   const user = useSelector(state => state.auth.user);
@@ -16,6 +17,7 @@ const Dashboard = () => {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
   const [quickSearchQuery, setQuickSearchQuery] = useState('');
+  const [selectedAstroProfile, setSelectedAstroProfile] = useState(null);
 
   // Dashboard Stats State
   const [stats, setStats] = useState({ 
@@ -652,6 +654,14 @@ const Dashboard = () => {
                             </div>
                             
                             <div className="p-4 pt-0">
+                              <button 
+                                onClick={() => setSelectedAstroProfile(match)}
+                                className="w-full mb-3 py-1.5 bg-rose-50/50 hover:bg-rose-100/50 text-[10px] font-bold text-rose-700 border border-rose-100/40 rounded-xl transition flex items-center justify-center gap-1 active:scale-95 cursor-pointer font-semibold"
+                              >
+                                <Sparkles className="w-3 h-3 text-rose-500" />
+                                Check Kundali Match
+                              </button>
+
                               <div className="border-t border-gray-50 pt-4 flex gap-2 w-full">
                                 <button
                                   disabled={isInterestSent || isConnecting}
@@ -852,6 +862,13 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      {/* Astrology Kundali Modal */}
+      <AstrologyModal 
+        isOpen={!!selectedAstroProfile}
+        onClose={() => setSelectedAstroProfile(null)}
+        targetProfile={selectedAstroProfile}
+        currentUserProfile={profile}
+      />
     </div>
   );
 };
